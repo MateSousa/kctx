@@ -10,7 +10,6 @@ import (
 )
 
 func main() {
-	// Find and load kubeconfig
 	kubeconfig := os.Getenv("KUBECONFIG")
 	if kubeconfig == "" {
 		if home := homedir.HomeDir(); home != "" {
@@ -21,20 +20,17 @@ func main() {
 		}
 	}
 
-	// Load the kubeconfig file to get contexts
 	config, err := clientcmd.LoadFromFile(kubeconfig)
 	if err != nil {
 		fmt.Printf("Error loading kubeconfig: %s\n", err)
 		os.Exit(1)
 	}
 
-	// Extract context names
 	var contexts []string
 	for context := range config.Contexts {
 		contexts = append(contexts, context)
 	}
 
-	// Create prompt
 	prompt := promptui.Select{
 		Label: "Select Kubernetes Context",
 		Items: contexts,
@@ -46,7 +42,6 @@ func main() {
 		return
 	}
 
-	// Change the context
 	config.CurrentContext = selectedContext
 	if err := clientcmd.WriteToFile(*config, kubeconfig); err != nil {
 		fmt.Printf("Error writing kubeconfig file: %s\n", err)
